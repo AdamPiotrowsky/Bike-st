@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Store</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <img src="/aaa.webp" alt="Bike Store Banner" class="banner">
+        <h1>Bike Store</h1>
+        <a href="/cart"><img src="/cart.jpg" alt="Cart" class="cart-icon"></a>
+    </header>
+    <div class="container">
+        <div id="message" class="message"></div> <!-- Element do wyświetlania komunikatów -->
+        <div class="bikes-grid">
+            <% bikes.forEach(bike => { %>
+                <div class="bike-card">
+                    <img src="/bikes/<%= bike.image %>" alt="<%= bike.name %>">
+                    <h2><%= bike.name %></h2>
+                    <p>Color: <%= bike.color %></p>
+                    <p>Price: $<%= bike.price %></p>
+                    <p>Type: <%= bike.type %></p>
+                    <p>Quality: <%= bike.quality %></p>
+                    <form class="add-to-cart-form" data-id="<%= bike.id %>">
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('.add-to-cart-form').on('submit', function(event) {
+                event.preventDefault();
+                const bikeId = $(this).data('id');
+                $.ajax({
+                    url: `/add-to-cart/${bikeId}`,
+                    method: 'POST',
+                    success: function(response) {
+                        showMessage('Bike added to cart successfully!', false);
+                    },
+                    error: function(xhr, status, error) {
+                        const response = xhr.responseJSON;
+                        showMessage(response ? response.message : 'Failed to add bike to cart. Please try again.', true);
+                    }
+                });
+            });
+
+            function showMessage(message, isError) {
+                const messageElement = $('#message');
+                messageElement.text(message).toggleClass('error', isError).fadeIn().delay(2000).fadeOut();
+            }
+        });
+    </script>
+</body>
+</html>

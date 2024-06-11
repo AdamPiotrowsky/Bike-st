@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <img src="/aaa.webp" alt="Bike Store Banner" class="banner">
+        <h1>Shopping Cart</h1>
+        <a href="/"><img src="/home.jpg" alt="Home" class="cart-icon"></a>
+    </header>
+    <div class="container">
+        <div id="message" class="message"><%= message %></div> <!-- Element do wyświetlania komunikatów -->
+        <div class="bikes-grid">
+            <% cart.forEach(item => { %>
+                <div class="bike-card">
+                    <img src="/bikes/<%= item.image %>" alt="<%= item.name %>">
+                    <h2><%= item.name %> - <%= item.mark %></h2>
+                    <p>Color: <%= item.color %></p>
+                    <p>Price: $<%= item.price %></p>
+                    <p>Type: <%= item.type %></p>
+                    <p>Quality: <%= item.quality %></p>
+                    <form action="/remove-from-cart/<%= item.id %>" method="POST">
+                        <button type="submit">Remove from Cart</button>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+        <form id="checkout-form">
+            <button type="submit">Checkout</button>
+        </form>
+        <form action="/cancel" method="POST">
+            <button type="submit">Cancel</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#checkout-form').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '/checkout',
+                    method: 'POST',
+                    success: function(response) {
+                        showMessage('Purchase successful!', false);
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500); // Odśwież stronę po 2 sekundach
+                    },
+                    error: function(xhr, status, error) {
+                        showMessage('Purchase failed!', true);
+                    }
+                });
+            });
+
+            function showMessage(message, isError) {
+                const messageElement = $('#message');
+                messageElement.text(message).toggleClass('error', isError).fadeIn().delay(2000).fadeOut();
+            }
+        });
+    </script>
+</body>
+</html>
